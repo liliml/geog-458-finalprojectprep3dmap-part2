@@ -1,0 +1,32 @@
+var types = {
+	"noise": {
+		"values": ["Noise - Commercial"],
+		"count": 20813,
+		"max": 278
+	},
+	"establishment": {
+		"values": ["Food Establishment"],
+		"count": 8354,
+		"max": 60
+	},
+	"poisoning": {
+		"values": ["Food Poisoning"],
+		"count": 2433,
+		"max": 15
+	},
+	"drinking": {
+		"values": ["Drinking"],
+		"count": 453,
+		"max": 8
+	},
+	"smoking": {
+		"values": ["Smoking"],
+		"count": 310,
+		"max": 10
+	},
+	"others": {
+		"values": ["Bottled Water", "Calorie Labeling", "Indoor Air Quality", "Urinating in Public"],
+		"count": 121,
+		"max": 9
+	}
+};
