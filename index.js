@@ -141,9 +141,9 @@ const schoolingColors = ['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c'];
 const legend = document.getElementById('legend');
 
 // disable scroll if it's embedded in a blog post
-if (window.location.search.indexOf('embed') !== -1) {
-    map.scrollZoom.disable();
-};
+// if (window.location.search.indexOf('embed') !== -1) {
+//     map.scrollZoom.disable();
+// };
 
 map.on('load', function() {
 
@@ -184,7 +184,7 @@ map.on('load', function() {
 
         if (this.id === activeType) {
             // click again to clear filter
-            activeType = "combined";
+            activeType = "income";
         } else {
             activeType = this.id;
             $(this).addClass('active');
@@ -626,11 +626,11 @@ map.on('load', function() {
     function setLayers() {
         $('.mapboxgl-popup').css('opacity', 0);
         if (activeCamera === "hexbin") {
-            map.setPaintProperty('points-complaints', 'circle-opacity', 0);
-            map.setPaintProperty('points-businesses', 'circle-opacity', 0);
+            //map.setPaintProperty('points-complaints', 'circle-opacity', 0);
+            //map.setPaintProperty('points-businesses', 'circle-opacity', 0);
             map.setPaintProperty('grids-3d', 'fill-extrusion-opacity', 0.6);
             map.setPaintProperty('grid-active', 'fill-extrusion-opacity', 0.6);
-            map.getSource('point-active').setData(empty);
+            //map.getSource('point-active').setData(empty);
         } 
         //COMMENTED OUT SECTION BELOW AS IT IS FOR ZOOMED IN VERSION!
         // else if (activeCamera === "dotted") {
@@ -654,7 +654,9 @@ map.on('load', function() {
         $("#style-" + camera).show();
     };
 
+    //THIS FUNCTION IS NOT CALLED FOR SOME REASON???
     function setDDS() {
+        //console.log("got here!");
         setLegend();
 
         maxColor = max[activeDDS]; //ORGINAL LINE
@@ -700,6 +702,7 @@ map.on('load', function() {
     };
 
     function setLegend(type) {
+        ////console.log("got here", type);
       var heights = percentiles[activeType];
       var maxnumber = max[activeType];
     //   // for visual brevity, set max height to 60 while others stay proportional
