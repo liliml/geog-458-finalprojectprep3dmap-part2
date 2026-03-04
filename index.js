@@ -6,26 +6,32 @@ var colorStops = ['#f2f0f7','#cbc9e2','#9e9ac8','#756bb1','#54278f','#3f007d'];
 var heightStop = 5000;
 var colorActive = "#3cc";
 var animationOptions = { duration: 5000, easing: .4 };
-var typeList = ["combined", "education", "income"];
+var typeList = ["combined", "education", "income"]; //IS FOR "TABS"
 // for DDS threshholds, [total, density]
 //"max" is for height AND colors! make a 2D array, one for education and one for income
+//IN OUR TEST VERSION WE ARE USING DATA MAX VALUES OF EDUCATION AND INCOME COLUMNS FOR THE YEAR 2000 DATA!!!
+//NOTE: VALUES MUST BE HERE AND MUST ALSO BE USED FOR ACTIVE TYPE AND ACTIVEDDS VARIABLES IN THE FOLLOWING LINES BELOW 
+//OR THE POP UP WILL NOT WORK AND CAN'T SELECT A COUNTRY!!!
 var max = {
     
-    "businesses": 46,
-    "combined": 283,
-    "noise": 278,
-    "establishment": 60,
-    "poisoning": 15,
-    "drinking": 8,
-    "smoking": 10,
-    "others": 9,
-    "totalDensity": 141.5,
-    "noiseDensity": 139,
-    "establishmentDensity": 20,
-    "poisoningDensity": 8,
-    "drinkingDensity": 5,
-    "smokingDensity": 10,
-    "othersDensity": 1.3,
+    // "businesses": 46,
+    // "combined": 283,
+    // "noise": 278,
+    // "establishment": 60,
+    // "poisoning": 15,
+    // "drinking": 8,
+    // "smoking": 10,
+    // "others": 9,
+    // "totalDensity": 141.5,
+    // "noiseDensity": 139,
+    // "establishmentDensity": 20,
+    // "poisoningDensity": 8,
+    // "drinkingDensity": 5,
+    // "smokingDensity": 10,
+    // "othersDensity": 1.3,
+
+    "education": 12.96,
+    "income": 37783.6626711242
 };
 //IS USED FOR THE ORGINAL LEGEND: var percentiles = {"combined":[1,1,3,5,14],"education":[1,1,3,6,20],"income":[1,1,2,3,6]};
 var empty = {
@@ -47,10 +53,12 @@ var previousCamera = {
 
 // active filter for each of the filter session
 var activeCamera = "hexbin";
-var activeType = "combined";
+var activeType = "income";
+//var activeType = "./grids.geojson";
+
 // result data field of camera, type, method combined
 //NOTE: DDS = active category aka map name, such as combined, education, or income
-var activeDDS = "combined"; //is grabbing "combined" which was called "total" in the original dictionary called "max", see variable above
+var activeDDS = "income"; //is grabbing "income" which was called "total" in the original dictionary called "max", see variable above
 var maxColor = max[activeDDS];
 var maxHeight = max[activeDDS];
 
@@ -120,8 +128,8 @@ let chart = null;
 
 // create a few constant variables.
 const incomeBreaks = [0, 2000, 5000, 10000, 20000, 40000];
-const incomeColors = ['#f2f0f7','#cbc9e2','#9e9ac8','#756bb1','#54278f','#3f007d'];
-
+//const incomeColors = ['#f2f0f7','#cbc9e2','#9e9ac8','#756bb1','#54278f','#3f007d'];
+//NOTE: WE ONLY NEED EDUCATION COLORING FOR COMBINED MAPS, SO COMMENTED OUT LINE ABOVE
 const schoolingBreaks = [0, 3, 6, 9, 12];
 const schoolingColors = ['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c'];
 
@@ -209,7 +217,7 @@ map.on('load', function() {
                 var numberComplaints = query[0].properties[activeType];
                 var numberBusinesses = query[0].properties.businesses;
                 var label = activeType.charAt(0).toUpperCase() + activeType.slice(1);
-                html = "<div class='grid grid--gut6 color-white align-center'>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + numberComplaints + "</div><p class='mx3'>" + label + " complaints</p></div>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + numberBusinesses + "</div><p class='mx3'>Restaurants and bars</p></div>" + "<div class='col--12 color-gray mt12'>Click to learn more</div></div>";
+                html = "<div class='grid grid--gut6 color-white align-center'>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + numberComplaints + "</div><p class='mx3'>" + label + " complaints???</p></div>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + numberBusinesses + "</div><p class='mx3'>Restaurants and bars</p></div>" + "<div class='col--12 color-gray mt12'>Click to learn more</div></div>";
             };
             map.getSource('grid-active').setData(gridActive);
             // else: "dotted" or "inspector"
@@ -263,33 +271,34 @@ map.on('load', function() {
         };
     });
 
-    // drill down a hexbin TODO, CUT THIS, IS FOR ZOOM IN THING
-    map.on('click', function(e) {
-        if (activeCamera === "hexbin") {
-            var query = map.queryRenderedFeatures(e.point, {
-                layers: ["grids-3d"]
-            });
-            // it's the same hexbin as the current highlight
-            if (query.length && query[0].properties.id === gridActive.features[0].properties.id) {
-                // UI changes
-                $("#back").show();
+    // drill down a hexbin /////TODO, CUT THIS, IS FOR ZOOM IN THING
+    // map.on('click', function(e) {
+    //     if (activeCamera === "hexbin") {
+    //         var query = map.queryRenderedFeatures(e.point, {
+    //             layers: ["grids-3d"]
+    //         });
+    //         // it's the same hexbin as the current highlight
+    //         if (query.length && query[0].properties.id === gridActive.features[0].properties.id) {
+    //             // UI changes
+    //             $("#back").show();
 
-                // prepare layers
-                activeCamera = "inspector";
-                setLayers();
+    //             // prepare layers
+    //             activeCamera = "inspector";
+    //             setLayers();
 
-                // Camera
-                getCamera();
-                var center = turf.center(gridActive);
-                map.flyTo({
-                    center: center.geometry.coordinates,
-                    zoom: 15,
-                    pitch: 0,
-                    speed: .3
-                });
-            };
-        };
-    });
+    //             // Camera
+    //             getCamera();
+    //             var center = turf.center(gridActive);
+    //             map.flyTo({
+    //                 center: center.geometry.coordinates,
+    //                 zoom: 15,
+    //                 pitch: 0,
+    //                 speed: .3
+    //             });
+    //         };
+    //     };
+    // });
+
     // resume to overview
     $("#back").click(function() {
 
