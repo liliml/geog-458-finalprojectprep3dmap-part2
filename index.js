@@ -3,7 +3,7 @@ var styleDark = 'mapbox://styles/mapbox/dark-v9';
 
 // global constants, other candidates include , #9ee0f5
 var colorStops = ['#f2f0f7','#cbc9e2','#9e9ac8','#756bb1','#54278f','#3f007d'];
-var heightStop = 5000;
+var heightStop = 100000;
 var colorActive = "#3cc";
 var animationOptions = { duration: 5000, easing: .4 };
 var typeList = ["combined", "AVG_YR_SCH", "INCOME"]; //IS FOR "TABS" BUT HAS TO BE COLUMN NAMES FOR NOW, SEE ACTIVETYPE VARIABLE BELOW FOR INFO
@@ -36,6 +36,8 @@ var max = {
     "income": 37783.6626711242
 };
 //IS USED FOR THE ORGINAL LEGEND: var percentiles = {"combined":[1,1,3,5,14],"education":[1,1,3,6,20],"income":[1,1,2,3,6]};
+//AM TESTING LINE BELOW, IS FOR LEGEND, ORGINAL IS ABOVE, NEED THIS FOR HEIGHT APPARENTLY, SEE CODE TOWARDS END IN SET LEGEND!
+var percentiles = {"combined":[1,1,3,5,14],"education":[1,1,3,6,20],"income":[1,1,2,3,6]};
 var empty = {
     "type": "FeatureCollection",
     "features": []
@@ -220,48 +222,52 @@ map.on('load', function() {
                 var numberComplaints = query[0].properties["AVG_YR_SCH"];
                 //ORGINAL: var numberBusinesses = query[0].properties.businesses;
                 var income_val = query[0].properties["INCOME"];
-                var label = activeType.charAt(0).toUpperCase() + activeType.slice(1);
-                html = "<div class='grid grid--gut6 color-white align-center'>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + numberComplaints + "</div><p class='mx3'>" + label + " Average Years of Schooling</p></div>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + income_val + "</div><p class='mx3'>Average Income in US Dollars</p></div>" + "<div class='col--12 color-gray mt12'></div></div>";
+                //TESTING REMOVING THIS: var label = activeType.charAt(0).toUpperCase() + activeType.slice(1);
+                //ORGINAL: html = "<div class='grid grid--gut6 color-white align-center'>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + numberComplaints + "</div><p class='mx3'>" + label + " Average Years of Schooling</p></div>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + income_val + "</div><p class='mx3'>Average Income in US Dollars</p></div>" + "<div class='col--12 color-gray mt12'></div></div>";
+                var countryname = query[0].properties["COUNTRY"]; //IS ADDED, IS TO PULL COUNTRY NAME AND SHOW IT AND SHOW COUNTRY SELECTED
+                html = "<div class='txt-xl txt-bold custom-ffc300'>" + countryname + "</div><p class='mx3'>" + "<div class='grid grid--gut6 color-white align-center'>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + numberComplaints + "</div><p class='mx3'>" + " Average Years of Schooling</p></div>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + "$" + income_val + "</div><p class='mx3'>Average Income in US Dollars</p></div>" + "<div class='col--12 color-gray mt12'></div></div>";
             };
             map.getSource('grid-active').setData(gridActive);
             // else: "dotted" or "inspector"
-        } else {
-            var queryComplaints = map.queryRenderedFeatures(e.point, {
-                layers: ["points-complaints"]
-            });
-            if (queryComplaints.length) {
-                var numberComplaints = queryComplaints.length;
-                var labelComplaints = numberComplaints == 1 ? " complaint" : " complaints";
-                var typeComplaints = activeType === 'combined' ? '' : ' about ' + activeType;
-                html += "<div class='grid grid--gut6 color-white align-center'>"
-                    + "<div class='col--12 px6'><div class='txt-xl txt-bold custom-ffc300'>" + numberComplaints
-                    + "</div><p>" + labelComplaints + " from this address" + typeComplaints + "</p></div><div class='col--12 mx12 pl6 grid my12'>";
+        } 
+        //TODO, COMMENT OUT THE ELSE STATMENT BELOW LATER AND FIX ERRORS, DON'T NEED SECTION BELOW AS IS FOR ZOOMED IN VERSION, COMMENTED OUT FOR NOW
+        // else {
+        //     var queryComplaints = map.queryRenderedFeatures(e.point, {
+        //         layers: ["points-complaints"]
+        //     });
+        //     if (queryComplaints.length) {
+        //         var numberComplaints = queryComplaints.length;
+        //         var labelComplaints = numberComplaints == 1 ? " complaint" : " complaints";
+        //         var typeComplaints = activeType === 'combined' ? '' : ' about ' + activeType;
+        //         html += "<div class='grid grid--gut6 color-white align-center'>"
+        //             + "<div class='col--12 px6'><div class='txt-xl txt-bold custom-ffc300'>" + numberComplaints
+        //             + "</div><p>" + labelComplaints + " from this address" + typeComplaints + "</p></div><div class='col--12 mx12 pl6 grid my12'>";
 
-                if (activeType === 'combined') {
-                    var typeCount = typeList.map(function(type) {
-                        var count = 0;
-                        // uppercase first letter of type
-                        var type = type.charAt(0).toUpperCase() + type.slice(1);
-                        queryComplaints.forEach(function(feature) {
-                            if (feature.properties['Complaint Type'].includes(type)) {
-                                count += 1;
-                            }
-                        });
-                        return count;
-                    });
+        //         if (activeType === 'combined') {
+        //             var typeCount = typeList.map(function(type) {
+        //                 var count = 0;
+        //                 // uppercase first letter of type
+        //                 var type = type.charAt(0).toUpperCase() + type.slice(1);
+        //                 queryComplaints.forEach(function(feature) {
+        //                     if (feature.properties['Complaint Type'].includes(type)) {
+        //                         count += 1;
+        //                     }
+        //                 });
+        //                 return count;
+        //             });
 
-                    for (var i = 1; i < typeList.length; i++) {
-                        html += "<div class='col--4 " + typeList[i] + " grid pt6 color-gray-light'><div class='icon mx3'></div>" + typeCount[i] + "</div>";
-                    }
-                }
-                html += "</div>";
+        //             for (var i = 1; i < typeList.length; i++) {
+        //                 html += "<div class='col--4 " + typeList[i] + " grid pt6 color-gray-light'><div class='icon mx3'></div>" + typeCount[i] + "</div>";
+        //             }
+        //         }
+        //         html += "</div>";
 
-                pointActive.features = queryComplaints;
-                map.getSource('point-active').setData(pointActive);
-            } else {
-                map.getSource('point-active').setData(empty);
-            };
-        };
+        //         pointActive.features = queryComplaints;
+        //         map.getSource('point-active').setData(pointActive);
+        //     } else {
+        //         map.getSource('point-active').setData(empty);
+        //     };
+        // };
 
         if (html === "") {
             $('.mapboxgl-popup').css('opacity', 0);
@@ -309,7 +315,8 @@ map.on('load', function() {
         activeCamera = "hexbin";
         // exception: only for inspector > hexbin case
         map.setPaintProperty('grid-active', 'fill-extrusion-height', {
-            property: activeDDS,
+            //ORGINAL AM TESTING IN LINE BELOW: property: activeDDS,
+            property: "INCOME",
             stops: [
                 [0, 0],
                 [maxHeight, heightStop]
@@ -354,10 +361,107 @@ map.on('load', function() {
     });
 
     function addLayers() {
+        //ORGINAL ADD LAYERS FUCTION STUFF FOR 3D LAYER, DON'T DELETE!!!
+        // map.addSource("grids", {
+        //     "type": "geojson",
+        //     "data": grids
+        // });
+        // // grid-3d
+        // map.addLayer({
+        //     "id": "grids-3d",
+        //     "type": "fill-extrusion",
+        //     "source": "grids",
+        //     "paint": {
+        //         "fill-extrusion-color": {
+        //             //ORGINAL AM TESTING IN LINE BELOW: property: activeDDS,
+        //             property: "iNCOME",
+        //             stops: [
+        //                 [maxColor * .2, colorStops[2]],
+        //                 [maxColor * .5, colorStops[3]],
+        //                 [maxColor * .8, colorStops[4]],
+        //                 [maxColor, colorStops[5]]
+        //             ]
+        //         },
+        //         "fill-extrusion-opacity": .6,
+        //         "fill-extrusion-height": {
+        //             //ORGINAL AM TESTING IN LINE BELOW: property: activeDDS,
+        //             property: "INCOME",
+        //             stops: [
+        //                 [0, 0],
+        //                 [maxHeight, heightStop]
+        //             ]
+        //         },
+        //         "fill-extrusion-height-transition": {
+        //             duration: 2000
+        //         },
+        //         "fill-extrusion-color-transition": {
+        //             duration: 2000
+        //         }
+        //     },
+        //     //ORIGINAL, AM TESTING LINE BELOW: "filter": ["all", ["!=", activeDDS, 0],
+        //     "filter": ["all", ["!=", "INCOME", 0],
+        //         ["!=", "businesses", 0]
+        //     ]
+        // }, "admin-2-boundaries-dispute");
 
+        // // subtle labels to show count by grid for 2D
+        // map.addLayer({
+        //     "id": "grids-count",
+        //     "type": "symbol",
+        //     "source": "grids",
+        //     "layout": {
+        //         //ORIGINAL, AM TESTING IN LINE BELOW: "text-field": "{" + activeDDS + "}",
+        //         "text-field": "{" + "INCOME" + "}",
+        //         "text-size": 14
+        //     },
+        //     "paint": {
+        //         "text-color": colorActive,
+        //         "text-opacity": {
+        //             stops: [
+        //                 [13, 0],
+        //                 [14, .8]
+        //             ]
+        //         },
+        //         "text-halo-color": "#2d2d2d",
+        //         "text-halo-width": 2,
+        //         "text-halo-blur": 1
+        //     }
+        // });
+
+        // map.addSource("grid-active", {
+        //     "type": "geojson",
+        //     "data": gridActive
+        // });
+        // map.addLayer({
+        //     "id": "grid-active",
+        //     "type": "fill-extrusion",
+        //     "source": "grid-active",
+        //     "paint": {
+        //         "fill-extrusion-color": colorActive,
+        //         "fill-extrusion-opacity": .6,
+        //         "fill-extrusion-height": {
+        //             //ORGINAL AM TESTING IN LINE BELOW: property: activeDDS,
+        //             property: "INCOME",
+        //             stops: [
+        //                 [0, 0],
+        //                 [maxHeight, heightStop]
+        //             ]
+        //         },
+        //         "fill-extrusion-height-transition": {
+        //             duration: 1500
+        //         },
+        //         "fill-extrusion-color-transition": {
+        //             duration: 1500
+        //         }
+        //     }
+        // }, "admin-2-boundaries-dispute");
+
+
+
+        //TEST AREA FROM CODE BELOW, USES COMMENTED OUT CODE IN SECTION ABOVE, AM TRYING TO USE REAL .GEOJSON FILE HERE LIKE NORMAL INSTEAD OF DDS THING AND GRIDS VARIABLE THTING:
         map.addSource("grids", {
             "type": "geojson",
-            "data": grids
+            "data": './grids.geojson'
         });
         // grid-3d
         map.addLayer({
@@ -366,7 +470,8 @@ map.on('load', function() {
             "source": "grids",
             "paint": {
                 "fill-extrusion-color": {
-                    property: activeDDS,
+                    //ORIGNAL: property: activeDDS,
+                    property: "INCOME",
                     stops: [
                         [maxColor * .2, colorStops[2]],
                         [maxColor * .5, colorStops[3]],
@@ -376,7 +481,8 @@ map.on('load', function() {
                 },
                 "fill-extrusion-opacity": .6,
                 "fill-extrusion-height": {
-                    property: activeDDS,
+                    //ORGINAL AM TESTING IN LINE BELOW: property: activeDDS,
+                    property: "INCOME",
                     stops: [
                         [0, 0],
                         [maxHeight, heightStop]
@@ -389,7 +495,8 @@ map.on('load', function() {
                     duration: 2000
                 }
             },
-            "filter": ["all", ["!=", activeDDS, 0],
+            //ORIGINAL, AM TESTING LINE BELOW: "filter": ["all", ["!=", activeDDS, 0],
+            "filter": ["all", ["!=", "INCOME", 0],
                 ["!=", "businesses", 0]
             ]
         }, "admin-2-boundaries-dispute");
@@ -400,7 +507,8 @@ map.on('load', function() {
             "type": "symbol",
             "source": "grids",
             "layout": {
-                "text-field": "{" + activeDDS + "}",
+                //ORIGINAL, AM TESTING IN LINE BELOW: "text-field": "{" + activeDDS + "}",
+                "text-field": "{" + "INCOME" + "}",
                 "text-size": 14
             },
             "paint": {
@@ -419,7 +527,8 @@ map.on('load', function() {
 
         map.addSource("grid-active", {
             "type": "geojson",
-            "data": gridActive
+            //ORGINAL, AM TESTING IN LINE BELOW: "data": gridActive
+            "data": "./grids.geojson"
         });
         map.addLayer({
             "id": "grid-active",
@@ -429,7 +538,8 @@ map.on('load', function() {
                 "fill-extrusion-color": colorActive,
                 "fill-extrusion-opacity": .6,
                 "fill-extrusion-height": {
-                    property: activeDDS,
+                    //ORGINAL AM TESTING IN LINE BELOW: property: activeDDS,
+                    property: "INCOME",
                     stops: [
                         [0, 0],
                         [maxHeight, heightStop]
@@ -444,69 +554,73 @@ map.on('load', function() {
             }
         }, "admin-2-boundaries-dispute");
 
-        // add businesses from tileset
-        map.addSource("points-businesses", {
-            "type": "vector",
-            "url": "mapbox://yunjieli.3i12h479"
-        });
-        map.addLayer({
-            "id": "points-businesses",
-            "type": "circle",
-            "source": "points-businesses",
-            "source-layer": "data_businesses-0lvzk6",
-            "paint": {
-                "circle-radius": {
-                    stops: [
-                        [12, 3],
-                        [15, 8]
-                    ]
-                },
-                "circle-color": colorStops[5],
-                "circle-opacity": 0
-            },
-        }, "admin-2-boundaries-dispute");
+        
 
-        // addd complaints from tileset
-        map.addSource("points-complaints", {
-            "type": "vector",
-            "url": "mapbox://yunjieli.7l1fqjio"
-        });
-        map.addLayer({
-            "id": "points-complaints",
-            "type": "circle",
-            "source": "points-complaints",
-            "source-layer": "data_complaints-1emuz6",
-            "paint": {
-                "circle-radius": {
-                    stops: [
-                        [12, 1],
-                        [15, 5]
-                    ]
-                },
-                "circle-color": colorStops[2],
-                "circle-opacity": 0
-            }
-        }, "admin-2-boundaries-dispute");
+        //DON'T NEED BUSINESSES DATA SO COMMENTED OUT ALSO IS FOR ZOOMED IN DATA VIEW TOO SO COMMENTED OUT FOR NOW
+        // // add businesses from tileset
+        // map.addSource("points-businesses", {
+        //     "type": "vector",
+        //     "url": "mapbox://yunjieli.3i12h479"
+        // });
+        // map.addLayer({
+        //     "id": "points-businesses",
+        //     "type": "circle",
+        //     "source": "points-businesses",
+        //     "source-layer": "data_businesses-0lvzk6",
+        //     "paint": {
+        //         "circle-radius": {
+        //             stops: [
+        //                 [12, 3],
+        //                 [15, 8]
+        //             ]
+        //         },
+        //         "circle-color": colorStops[5],
+        //         "circle-opacity": 0
+        //     },
+        // }, "admin-2-boundaries-dispute");
 
-        map.addSource("point-active", {
-            "type": "geojson",
-            "data": pointActive
-        });
-        map.addLayer({
-            "id": "point-active",
-            "type": "circle",
-            "source": "point-active",
-            // "layout": {
-            //     "icon-image": "highlight",
-            //     "icon-rotation-alignment": "map"
-            // },
-            "paint": {
-                "circle-radius": 15,
-                "circle-color": colorStops[2],
-                "circle-opacity": .3,
-                "circle-blur": 1
-            }
-        }, "points-businesses");
+        //DON'T NEED COMPALINTS DATA SO COMMENTED OUT ALSO IS FOR ZOOMED IN DATA VIEW TOO SO COMMENTED OUT FOR NOW
+        // // addd complaints from tileset
+        // map.addSource("points-complaints", {
+        //     "type": "vector",
+        //     "url": "mapbox://yunjieli.7l1fqjio"
+        // });
+        // map.addLayer({
+        //     "id": "points-complaints",
+        //     "type": "circle",
+        //     "source": "points-complaints",
+        //     "source-layer": "data_complaints-1emuz6",
+        //     "paint": {
+        //         "circle-radius": {
+        //             stops: [
+        //                 [12, 1],
+        //                 [15, 5]
+        //             ]
+        //         },
+        //         "circle-color": colorStops[2],
+        //         "circle-opacity": 0
+        //     }
+        // }, "admin-2-boundaries-dispute");
+
+        // map.addSource("point-active", {
+        //     "type": "geojson",
+        //     "data": pointActive
+        // });
+        // map.addLayer({
+        //     "id": "point-active",
+        //     "type": "circle",
+        //     "source": "point-active",
+        //     // "layout": {
+        //     //     "icon-image": "highlight",
+        //     //     "icon-rotation-alignment": "map"
+        //     // },
+        //     "paint": {
+        //         "circle-radius": 15,
+        //         "circle-color": colorStops[2],
+        //         "circle-opacity": .3,
+        //         "circle-blur": 1
+        //     }
+        // }, "points-businesses");
     };
 
     function setLayers() {
@@ -517,19 +631,21 @@ map.on('load', function() {
             map.setPaintProperty('grids-3d', 'fill-extrusion-opacity', 0.6);
             map.setPaintProperty('grid-active', 'fill-extrusion-opacity', 0.6);
             map.getSource('point-active').setData(empty);
-        } else if (activeCamera === "dotted") {
-            map.setPaintProperty('points-complaints', 'circle-opacity', 0.3);
-            map.setPaintProperty('points-businesses', 'circle-opacity', .2);
-            map.setPaintProperty('grids-3d', 'fill-extrusion-opacity', 0);
-            map.setPaintProperty('grid-active', 'fill-extrusion-opacity', 0);
-            // map.getSource('grid-active').setData(empty);
-        } else if (activeCamera === "inspector") {
-            map.setPaintProperty('points-complaints', 'circle-opacity', 0.3);
-            map.setPaintProperty('points-businesses', 'circle-opacity', .2);
-            map.setPaintProperty('grids-3d', 'fill-extrusion-opacity', 0);
-            map.setPaintProperty('grid-active', 'fill-extrusion-opacity', 0.2);
-            map.setPaintProperty('grid-active', 'fill-extrusion-height', 0);
-        };
+        } 
+        //COMMENTED OUT SECTION BELOW AS IT IS FOR ZOOMED IN VERSION!
+        // else if (activeCamera === "dotted") {
+        //     map.setPaintProperty('points-complaints', 'circle-opacity', 0.3);
+        //     map.setPaintProperty('points-businesses', 'circle-opacity', .2);
+        //     map.setPaintProperty('grids-3d', 'fill-extrusion-opacity', 0);
+        //     map.setPaintProperty('grid-active', 'fill-extrusion-opacity', 0);
+        //     // map.getSource('grid-active').setData(empty);
+        // } else if (activeCamera === "inspector") {
+        //     map.setPaintProperty('points-complaints', 'circle-opacity', 0.3);
+        //     map.setPaintProperty('points-businesses', 'circle-opacity', .2);
+        //     map.setPaintProperty('grids-3d', 'fill-extrusion-opacity', 0);
+        //     map.setPaintProperty('grid-active', 'fill-extrusion-opacity', 0.2);
+        //     map.setPaintProperty('grid-active', 'fill-extrusion-height', 0);
+        // };
 
         // set legend
         // if it's dotted, it's the same as dotted
@@ -541,11 +657,13 @@ map.on('load', function() {
     function setDDS() {
         setLegend();
 
-        maxColor = max[activeDDS];
+        maxColor = max[activeDDS]; //ORGINAL LINE
+        //TESTING: maxColor = max["INCOME"];
         maxHeight = $("#density").is(":checked") ? max["totalDensity"] : max["combined"];
 
         map.setPaintProperty('grids-3d', 'fill-extrusion-color', {
-            property: activeDDS,
+            //ORGINAL, AM TESTING IN LINE BELOW: property: activeDDS,
+            property: gridActive.features[query[0].properties["INCOME"]],
             stops: [
                 [0, colorStops[1]],
                 [maxColor * .2, colorStops[2]],
@@ -555,36 +673,39 @@ map.on('load', function() {
             ]
         });
         map.setPaintProperty('grids-3d', 'fill-extrusion-height', {
-            property: activeDDS,
+            //ORGINAL AM TESTING IN LINE BELOW: property: activeDDS,
+            property: gridActive.features[query[0].properties["INCOME"]],
             stops: [
                 [0, 0],
                 [maxHeight, heightStop]
             ]
         });
-        map.setLayoutProperty('grids-count', 'text-field', '{' + activeDDS + '}');
+        //ORGINAL, AM TESTING IN LINE BELOW: map.setLayoutProperty('grids-count', 'text-field', '{' + activeDDS + '}');
+        map.setLayoutProperty('grids-count', 'text-field', '{' + INCOME + '}');
 
-        // if inside inspector, don't change height
-        if (activeCamera === "hexbin") {
-            map.setPaintProperty('grid-active', 'fill-extrusion-height', {
-                property: activeDDS,
-                stops: [
-                    [0, 0],
-                    [maxHeight, heightStop]
-                ]
-            });
-        };
+        //DON'T NEED SECTION BELOW AND COMMENTED OUT AS IT IS FOR ZOOMED IN VIEW
+        // // if inside inspector, don't change height
+        // if (activeCamera === "hexbin") {
+        //     map.setPaintProperty('grid-active', 'fill-extrusion-height', {
+        //         property: activeDDS,
+        //         stops: [
+        //             [0, 0],
+        //             [maxHeight, heightStop]
+        //         ]
+        //     });
+        // };
 
         // update max number in legend
         $(".label.max").html(maxColor);
     };
 
     function setLegend(type) {
-    //   var heights = percentiles[activeType];
-    //   var maxnumber = max[activeType];
+      var heights = percentiles[activeType];
+      var maxnumber = max[activeType];
     //   // for visual brevity, set max height to 60 while others stay proportional
     //   // var maxheight = maxnumber / heights[4] > 3 ? heights[4] * 3 : maxnumber;
-    //   var maxheight = Math.log(maxnumber);
-    //   var base = 60;
+      var maxheight = Math.log(maxnumber);
+      var base = 60;
 
     //   $("#style-hexbin .hh1").height( Math.max( 1, Math.log(heights[1]) / maxheight * base) );
     //   $("#style-hexbin .hh2").height( Math.max( 1, Math.log(heights[2]) / maxheight * base) );
