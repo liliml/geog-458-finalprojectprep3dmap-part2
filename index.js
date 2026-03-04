@@ -195,7 +195,7 @@ map.on('load', function() {
         setDDS();
 
         // for dotted
-        var filter = activeType === "combined" ? ["has", "Complaint Type"] : ["in", "Complaint Type"].concat(types[activeType]["values"]);
+        var filter = activeType === "income" ? ["has", "Complaint Type"] : ["in", "Complaint Type"].concat(types[activeType]["values"]);
         map.setFilter("points-complaints", filter);
     });
 
@@ -654,14 +654,14 @@ map.on('load', function() {
         $("#style-" + camera).show();
     };
 
-    //THIS FUNCTION IS NOT CALLED FOR SOME REASON???
+    //THIS FUNCTION DESPITE BEING CALLED IN ANOTHER FUNCTION DOES NOT SEEM TO BE USED AS CONSOLE.LOG DOESN'T SHOW MESSAGE???
     function setDDS() {
         //console.log("got here!");
         setLegend();
 
         maxColor = max[activeDDS]; //ORGINAL LINE
         //TESTING: maxColor = max["INCOME"];
-        maxHeight = $("#density").is(":checked") ? max["totalDensity"] : max["combined"];
+        maxHeight = $("#density").is(":checked") ? max["totalDensity"] : max["income"];
 
         map.setPaintProperty('grids-3d', 'fill-extrusion-color', {
             //ORGINAL, AM TESTING IN LINE BELOW: property: activeDDS,
@@ -717,10 +717,10 @@ map.on('load', function() {
     //   $("#style-hexbin .hh5").height(base);
     //   $("#style-hexbin .max").text(maxnumber);
     //   $("#style-hexbin .chart-title").text("Total complaints");
-        let breaks = type === "combined" ? incomeBreaks : schoolingBreaks;
-        let colors = type === "combined" ? incomeColors : schoolingColors;
+        let breaks = type === "income" ? incomeBreaks : schoolingBreaks;
+        let colors = type === "income" ? incomeColors : schoolingColors;
 
-        let labels = [`<strong>${type === "combined" ? "Avg Yearly Income (USD)" : "Avg Years Schooling"}</strong>`];
+        let labels = [`<strong>${type === "income" ? "Avg Yearly Income (USD)" : "Avg Years Schooling"}</strong>`];
 
         for (let i = 0; i < breaks.length - 1; i++) {
             labels.push(`
