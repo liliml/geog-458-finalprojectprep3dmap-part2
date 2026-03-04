@@ -6,7 +6,8 @@ var colorStops = ['#f2f0f7','#cbc9e2','#9e9ac8','#756bb1','#54278f','#3f007d'];
 var heightStop = 5000;
 var colorActive = "#3cc";
 var animationOptions = { duration: 5000, easing: .4 };
-var typeList = ["combined", "education", "income"]; //IS FOR "TABS"
+var typeList = ["combined", "AVG_YR_SCH", "INCOME"]; //IS FOR "TABS" BUT HAS TO BE COLUMN NAMES FOR NOW, SEE ACTIVETYPE VARIABLE BELOW FOR INFO
+
 // for DDS threshholds, [total, density]
 //"max" is for height AND colors! make a 2D array, one for education and one for income
 //IN OUR TEST VERSION WE ARE USING DATA MAX VALUES OF EDUCATION AND INCOME COLUMNS FOR THE YEAR 2000 DATA!!!
@@ -30,6 +31,7 @@ var max = {
     // "smokingDensity": 10,
     // "othersDensity": 1.3,
 
+    //NOTE: DON'T CHANGE OR MESS WITH THIS, WILL MAKE DATA NOT SHOW IF MESSING WITH THIS!
     "education": 12.96,
     "income": 37783.6626711242
 };
@@ -53,7 +55,7 @@ var previousCamera = {
 
 // active filter for each of the filter session
 var activeCamera = "hexbin";
-var activeType = "income";
+var activeType = "INCOME"; //THIS HAS TO BE ONE OF THE "COLUMN VALUE NAMES" IN THE DATASET! IN THIS CASE WE ARE USING INCOME
 //var activeType = "./grids.geojson";
 
 // result data field of camera, type, method combined
@@ -122,9 +124,9 @@ var map = new mapboxgl.Map({
 
 
 // declare the coordinated chart as well as other variables.
-let chart = null;
-    activeLayer = "income";
-    worldData = null;
+// let chart = null;
+//     activeLayer = "income";
+//     worldData = null;
 
 // create a few constant variables.
 const incomeBreaks = [0, 2000, 5000, 10000, 20000, 40000];
@@ -214,10 +216,11 @@ map.on('load', function() {
             });
             if (query.length) {
                 gridActive.features = [query[0]];
-                var numberComplaints = query[0].properties[activeType];
-                var numberBusinesses = query[0].properties.businesses;
+                var numberComplaints = query[0].properties["AVG_YR_SCH"];
+                //ORGINAL: var numberBusinesses = query[0].properties.businesses;
+                var income_val = query[0].properties["INCOME"];
                 var label = activeType.charAt(0).toUpperCase() + activeType.slice(1);
-                html = "<div class='grid grid--gut6 color-white align-center'>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + numberComplaints + "</div><p class='mx3'>" + label + " complaints???</p></div>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + numberBusinesses + "</div><p class='mx3'>Restaurants and bars</p></div>" + "<div class='col--12 color-gray mt12'>Click to learn more</div></div>";
+                html = "<div class='grid grid--gut6 color-white align-center'>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + numberComplaints + "</div><p class='mx3'>" + label + " Average Years of Schooling</p></div>" + "<div class='col--6'><div class='txt-xl txt-bold custom-ffc300'>" + income_val + "</div><p class='mx3'>Average Income in US Dollars</p></div>" + "<div class='col--12 color-gray mt12'></div></div>";
             };
             map.getSource('grid-active').setData(gridActive);
             // else: "dotted" or "inspector"
