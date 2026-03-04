@@ -216,6 +216,7 @@ map.on('load', function() {
             });
             if (query.length) {
                 gridActive.features = [query[0]];
+                //***NOTE: "numberComplaints" variable is actually showing AVG_YR_SCH column of data aka average years of schooling column
                 var numberComplaints = query[0].properties["AVG_YR_SCH"];
                 //ORGINAL: var numberBusinesses = query[0].properties.businesses;
                 var income_val = query[0].properties["INCOME"];
