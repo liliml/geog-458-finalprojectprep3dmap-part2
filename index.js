@@ -120,6 +120,7 @@ var map = new mapboxgl.Map({
     style: style331, // style URL
     zoom: 1.2, // starting zoom
     minZoom: 1,
+    pitch: 45,// pitch is like "angle" of the map view
     center: [0, 20] // starting center
 });
 
