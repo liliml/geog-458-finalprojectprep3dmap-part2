@@ -103,11 +103,22 @@
   }
   /*styles session*/
 
-  #style-hexbin {
+  /* #style-hexbin {
     transition: height .4s ease;
   }
 
   #style-hexbin .bar {
+    flex-basis: 20%;
+    height: 60px;
+    transition: height .4s ease;
+  } */
+
+  /* ADDED TWO SELECTORS BELOW FOR "legend" TO SHOW UP SINCE ID IS CALLED LEGEND AND NOT "style-hexbin" */
+  #legend {
+    transition: height .4s ease;
+  }
+
+  #legend .bar {
     flex-basis: 20%;
     height: 60px;
     transition: height .4s ease;
@@ -246,7 +257,7 @@
       <div class="mobile-btn show-more">Show more</div>
       <div class="mobile-btn show-less">Show less</div>
     </div>
-    <!-- ORINGAL: <div id="style-hexbin" class="style pt12 py18 border-t border--black"> -->
+    <!-- <div id="style-hexbin" class="style pt12 py18 border-t border--black">  -->
     <div id="legend" class="style pt12 py18 border-t border--black">
       <small class="align-center txt-s txt-uppercase color-gray-light">
         Legend

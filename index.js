@@ -37,7 +37,7 @@ var max = {
 };
 //IS USED FOR THE ORGINAL LEGEND: var percentiles = {"combined":[1,1,3,5,14],"education":[1,1,3,6,20],"income":[1,1,2,3,6]};
 //AM TESTING LINE BELOW, IS FOR LEGEND, ORGINAL IS ABOVE, NEED THIS FOR HEIGHT APPARENTLY, SEE CODE TOWARDS END IN SET LEGEND!
-var percentiles = {"combined":[1,1,3,5,14],"education":[1,1,3,6,20],"income":[1,1,2,3,6]};
+var percentiles = {"combined":[1,1,3,5,14],"education":[1,1,3,6,20],"income":[1,1,2,3,6]}; //NOTE: HAVE TO HAVE THIS FOR CHLOROPLETH MAP THING, SEE CODE TOWARDS END IN SET LEGEND FUNCTION
 var empty = {
     "type": "FeatureCollection",
     "features": []
@@ -132,7 +132,7 @@ var map = new mapboxgl.Map({
 
 // create a few constant variables.
 const incomeBreaks = [0, 2000, 5000, 10000, 20000, 40000];
-//const incomeColors = ['#f2f0f7','#cbc9e2','#9e9ac8','#756bb1','#54278f','#3f007d'];
+const incomeColors = ['#f2f0f7','#cbc9e2','#9e9ac8','#756bb1','#54278f','#3f007d'];
 //NOTE: WE ONLY NEED EDUCATION COLORING FOR COMBINED MAPS, SO COMMENTED OUT LINE ABOVE
 const schoolingBreaks = [0, 3, 6, 9, 12];
 const schoolingColors = ['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c'];
@@ -147,7 +147,7 @@ const legend = document.getElementById('legend');
 
 map.on('load', function() {
 
-    setLegend();
+    setLegend(activeDDS);
 
     map.addControl(new mapboxgl.NavigationControl({
         position: 'top-right'
@@ -657,7 +657,7 @@ map.on('load', function() {
     //THIS FUNCTION DESPITE BEING CALLED IN ANOTHER FUNCTION DOES NOT SEEM TO BE USED AS CONSOLE.LOG DOESN'T SHOW MESSAGE???
     function setDDS() {
         //console.log("got here!");
-        setLegend();
+        setLegend(activeDDS);
 
         maxColor = max[activeDDS]; //ORGINAL LINE
         //TESTING: maxColor = max["INCOME"];
@@ -701,7 +701,7 @@ map.on('load', function() {
         $(".label.max").html(maxColor);
     };
 
-    function setLegend(type) {
+    function setLegend(activeDDSvalue) {
         ////console.log("got here", type);
       var heights = percentiles[activeType];
       var maxnumber = max[activeType];
@@ -717,10 +717,14 @@ map.on('load', function() {
     //   $("#style-hexbin .hh5").height(base);
     //   $("#style-hexbin .max").text(maxnumber);
     //   $("#style-hexbin .chart-title").text("Total complaints");
-        let breaks = type === "income" ? incomeBreaks : schoolingBreaks;
-        let colors = type === "income" ? incomeColors : schoolingColors;
+        
+        //ORINGAL: let breaks = activeDDSvalue === "income" ? incomeBreaks : schoolingBreaks;
+        //ORGINAL: let colors = activeDDSvalue === "income" ? incomeColors : schoolingColors;
 
-        let labels = [`<strong>${type === "income" ? "Avg Yearly Income (USD)" : "Avg Years Schooling"}</strong>`];
+        let breaks = incomeBreaks;
+        let colors = colorStops;
+
+        let labels = [`<strong>${activeDDSvalue === "income" ? "Avg Yearly Income (USD)" : "Avg Years Schooling"}</strong>`];
 
         for (let i = 0; i < breaks.length - 1; i++) {
             labels.push(`
