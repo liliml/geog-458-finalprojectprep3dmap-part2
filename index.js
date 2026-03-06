@@ -485,7 +485,7 @@ map.on('load', function() {
                     //ORGINAL AM TESTING IN LINE BELOW: property: activeDDS,
                     property: "INCOME",
                     stops: [
-                        [0, 0],
+                        [0, 10],
                         [maxHeight, heightStop]
                     ]
                 },
