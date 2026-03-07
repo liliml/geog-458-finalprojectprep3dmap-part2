@@ -1,5 +1,5 @@
 var style331 = 'mapbox://styles/yunjieli/ciu7h63gy00052inrtutrxnfp';
-var styleDark = 'mapbox://styles/mapbox/dark-v9';
+//var styleDark = 'mapbox://styles/mapbox/dark-v9';
 
 // global constants, other candidates include , #9ee0f5
 var colorStops = ['#f2f0f7','#cbc9e2','#9e9ac8','#756bb1','#54278f','#3f007d'];
